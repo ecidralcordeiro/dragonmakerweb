@@ -62,6 +62,16 @@ export default forwardRef((props, ref) => {
     }
   };
 
+  const getFullAddress = async () => {
+      try {
+        let response = await blogFetch.get(`/viacep/${state}/${city}/${street}`);
+        let data = response.data;
+        console.log(data)
+      } catch (error) {
+        console.error(error);
+      }
+    
+  };
   const addContact = async () => {
     if (isValidCPF(cpf)) {
       setValid(true);
@@ -228,7 +238,9 @@ export default forwardRef((props, ref) => {
               variant="outlined"
               fullWidth
               value={street}
-              onChange={(e) => setStreet(e.target.value)}
+              onChange={(e) => {setStreet(e.target.value)
+                getFullAddress()
+              }}
             />
           </div>
           <div className="mb-3">
