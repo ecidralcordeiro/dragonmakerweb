@@ -4,7 +4,7 @@ import blogFetch from "../../../axios/config";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Navbar from "../../menus/Navbar";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
 import { Modal } from "react-bootstrap";
 import TextField from "@mui/material/TextField";
@@ -46,8 +46,6 @@ export default function Contact() {
     }
   };
 
-
-
   const modalAdd = () => {
     return (
       <Modal show={showModalAdd} onHide={() => setShowModalAdd(false)}>
@@ -71,10 +69,15 @@ export default function Contact() {
             onClick={async () => {
               setLoading(true);
               try {
-                await ref.current.addContact();
+                let isValid = await ref.current.addContact();
                 setLoading(false);
-                setShowModalAdd(false);
-                getContacts();
+
+                if (isValid !== false) {
+                  setLoading(false);
+                  setShowModalEdit(false);
+                  getContacts();
+                }
+                
               } catch (error) {
                 console.error();
                 setLoading(false);
@@ -88,7 +91,6 @@ export default function Contact() {
     );
   };
 
-
   const modalEdit = () => {
     return (
       <Modal show={showModalEdit} onHide={() => setShowModalEdit(false)}>
@@ -96,8 +98,7 @@ export default function Contact() {
           <Modal.Title>Editar Bloco</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <ContactForm ref={ref} id={ContactId}></ContactForm>
-
+          <ContactForm ref={ref} id={ContactId}></ContactForm>
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -113,10 +114,14 @@ export default function Contact() {
             onClick={async () => {
               setLoading(true);
               try {
-                await ref.current.updateContact();
+                let isValid = await ref.current.updateContact();
                 setLoading(false);
-                setShowModalEdit(false);
-                getContacts();
+
+                if (isValid !== false) {
+                  setLoading(false);
+                  setShowModalEdit(false);
+                  getContacts();
+                }
               } catch (error) {
                 console.error();
                 setLoading(false);
@@ -136,9 +141,7 @@ export default function Contact() {
         <Modal.Header closeButton>
           <Modal.Title>Deletar Contato</Modal.Title>
         </Modal.Header>
-        <Modal.Body >
-          Deseja realmente deletar o Contato?
-        </Modal.Body>
+        <Modal.Body>Deseja realmente deletar o Contato?</Modal.Body>
         <Modal.Footer>
           <Button
             variant="text"
@@ -176,14 +179,13 @@ export default function Contact() {
       <div className="app_body">
         <div className="header_tables_view">
           <div>
-          <TextField
+            <TextField
               required
               id="outlined-basic-name"
               label="Pesquisa"
               variant="outlined"
               fullWidth
               onChange={(e) => setFilter(e.target.value)}
-
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.keyCode === 13) getContactsFilter();
               }}
@@ -211,7 +213,7 @@ export default function Contact() {
               <th>Telefone</th>
               <th>CEP</th>
               <th>Cidade</th>
-         
+
               <th className="edit">Editar</th>
               <th className="edit">Excluir</th>
             </tr>

@@ -23,7 +23,7 @@ export default forwardRef((props, ref) => {
   const [country, setCountry] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-
+  const [valid, setValid] = useState(true);
   useEffect(() => {
     getContacts();
   }, []);
@@ -63,6 +63,46 @@ export default forwardRef((props, ref) => {
   };
 
   const addContact = async () => {
+    if (isValidCPF(cpf)) {
+      setValid(true);
+      let address = {
+        street: street,
+        number: number,
+        neighborhood: neighborhood,
+        city: city,
+        state: state,
+        postalCode: postalCode,
+        country: country,
+        latitude: latitude,
+        longitude: longitude,
+      };
+
+      try {
+        const addressResponse = await blogFetch.post("/address", address);
+
+        let contact = {
+          name: name,
+          cpf: cpf,
+          phone: phone,
+          address: {
+            id: addressResponse.data,
+          },
+        };
+
+        const contactResponse = await blogFetch.post("/contact", contact);
+        console.log(contactResponse.status);
+        return contactResponse.status;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    } else {
+      setValid(false);
+      return false;
+    }
+  };
+
+  const updateContact = async () => {
     let address = {
       street: street,
       number: number,
@@ -76,58 +116,29 @@ export default forwardRef((props, ref) => {
     };
 
     try {
-      const addressResponse = await blogFetch.post("/address", address);
-
-
+      const addressResponse = await blogFetch.put(
+        "/address/" + addressId,
+        address
+      );
       let contact = {
         name: name,
         cpf: cpf,
         phone: phone,
         address: {
-          id: addressResponse.data,
+          id: addressId,
         },
       };
 
-      const contactResponse = await blogFetch.post("/contact", contact);
+      const contactResponse = await blogFetch.put(
+        "/contact/" + props.id,
+        contact
+      );
       console.log(contactResponse.status);
       return contactResponse.status;
     } catch (error) {
       console.error(error);
       return null;
     }
-  };
-
-  const updateContact = async () => {
-    let address = {
-        street: street,
-        number: number,
-        neighborhood: neighborhood,
-        city: city,
-        state: state,
-        postalCode: postalCode,
-        country: country,
-        latitude: latitude,
-        longitude: longitude,
-      };
-  
-      try {
-        const addressResponse = await blogFetch.put("/address/"+ addressId , address);
-        let contact = {
-          name: name,
-          cpf: cpf,
-          phone: phone,
-          address: {
-            id: addressId,
-          },
-        };
-  
-        const contactResponse = await blogFetch.put("/contact/"+ props.id, contact);
-        console.log(contactResponse.status);
-        return contactResponse.status;
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
   };
 
   return (
@@ -159,8 +170,9 @@ export default forwardRef((props, ref) => {
               variant="outlined"
               fullWidth
               value={cpf}
-              onChange={(e) => {setCpf(e.target.value);
-                console.log(isValidCPF(e.target.value))}}
+              onChange={(e) => setCpf(e.target.value)}
+              error={!valid}
+              helperText={!valid ? "CPF inválido" : ""}
             />
           </div>
           <div className="mb-3">
