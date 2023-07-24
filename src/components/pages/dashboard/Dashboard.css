@@ -1,0 +1,32 @@
+.dashboard_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.table_container {
+  width: 35%;
+  margin-right: 20px;
+}
+
+.table_container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table_container th,
+.table_container td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.table_container th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.map_container {
+  width: 65%; 
+  height: 80vh;
+}
+
